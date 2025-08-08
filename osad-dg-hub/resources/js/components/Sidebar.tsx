@@ -37,15 +37,15 @@ const UserIcon = ({ className = "w-10 h-10" }: { className?: string }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
     </svg>
 );
-// --- UPDATED ICON SIZE ---
-const ChevronDownIcon = ({ className = 'w-2 h-2' }: { className?: string }) => (
+// Removed the default size from the component definition
+const ChevronDownIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
   </svg>
 );
 
 
-// --- Sidebar Component (Logic Unchanged) ---
+// --- Sidebar Component ---
 const Sidebar = () => {
     const { url } = usePage();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -113,7 +113,8 @@ const Sidebar = () => {
                                             <link.icon className="w-6 h-6 mr-4" />
                                             <span className="font-medium">{link.name}</span>
                                         </div>
-                                        <ChevronDownIcon className={`transition-transform duration-200 ${openMenu === link.name ? 'rotate-180' : ''}`} />
+                                        {/* --- APPLIED SIZE DIRECTLY HERE --- */}
+                                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${openMenu === link.name ? 'rotate-180' : ''}`} />
                                     </button>
                                     {openMenu === link.name && (
                                         <ul className="pl-8 mt-2 space-y-2">
