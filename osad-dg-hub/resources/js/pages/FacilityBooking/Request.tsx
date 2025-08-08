@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout'; // Import the layout
+import { Head } from '@inertiajs/react'; // Import Head for title
 
 // A simple icon component to display SVG icons like the calendar and clock.
 const Icon = ({ path, className = 'w-5 h-5' }: { path: string; className?: string }) => (
@@ -41,8 +43,11 @@ const RequestFacilityPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 flex-1 p-8">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    // Wrap the entire page content with the AuthenticatedLayout
+    <AuthenticatedLayout>
+      <Head title="Request Facility" />
+
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
         
         {/* Page Header */}
         <header>
@@ -158,7 +163,7 @@ const RequestFacilityPage = () => {
 
         </form>
       </div>
-    </div>
+    </AuthenticatedLayout>
   );
 };
 

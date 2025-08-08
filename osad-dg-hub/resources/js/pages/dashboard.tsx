@@ -1,11 +1,11 @@
-// resources/js/pages/dashboard.tsx
-
+// resources/js/pages/Dashboard.tsx
 import React from 'react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
 const Dashboard: React.FC = () => {
   return (
+    // The AuthenticatedLayout component wraps your page content
     <AuthenticatedLayout>
       <Head title="Dashboard" />
       <div className="p-8">
