@@ -21,8 +21,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- Facility Booking Routes ---
     Route::get('/facility-booking/request', function () {
-        // This tells Inertia to render the component at:
-        // resources/js/pages/FacilityBooking/Request.tsx
         return Inertia::render('FacilityBooking/Request');
     })->name('facility-booking.request');
 
@@ -30,18 +28,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('FacilityBooking/Overview');
     })->name('facility-booking.overview');
 
+    // --- Student Concern Routes ---
+    Route::get('/student-concern/overview', function () {
+        return Inertia::render('StudentConcern/Overview');
+    })->name('student-concern.overview');
+
+    Route::get('/student-concern/lodge', function () {
+        // You will need to create a 'StudentConcern/Lodge.tsx' component for this page
+        return Inertia::render('StudentConcern/Lodge');
+    })->name('student-concern.lodge');
+
 
     Route::get('organization-management', [OrganizationManagementController::class, 'index'])
         ->name('organization-management');
 
-    // --- Placeholder routes for other sidebar links ---
+    // --- Placeholder route for Calendar ---
     Route::get('/calendar', function () {
         return Inertia::render('Calendar');
     })->name('calendar');
 
-    Route::get('/student-concern', function () {
-        return Inertia::render('StudentConcern');
-    })->name('student-concern');
 });
 
 // Ensure these files exist and contain your authentication and settings routes.
