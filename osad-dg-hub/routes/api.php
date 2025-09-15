@@ -22,6 +22,9 @@ Route::get('/requests', [BookingRequestController::class, 'index']);
 Route::get('/concerns/overview', [ConcernController::class, 'overview']);
 Route::post('/concerns/create', [ConcernController::class, 'store']); // Moved for testing
 Route::get('/warnings', [WarningSlipController::class, 'index']);
+Route::get('/admin/dashboard-data', [AdminDashboardController::class, 'getData']); // <-- ADD THIS LINE
+Route::get('/admin/booking-requests', [AdminBookingController::class, 'index']);
+Route::patch('/admin/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus']); // Handles approve/reject
 // --- END OF TEMPORARY ROUTES ---
 
 

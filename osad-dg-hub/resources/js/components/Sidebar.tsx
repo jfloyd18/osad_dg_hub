@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import { SharedData } from '@/types'; // Assumes your types are in resources/js/types/index.d.ts
 
 // --- Icon Components ---
 const HomeIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> );
@@ -19,10 +20,9 @@ type NavLinkItem = {
 };
 
 const Sidebar = () => {
-    // --- 1. GET PROPS CORRECTLY ---
-    const { auth, ziggy } = usePage().props;
+    const { auth, ziggy } = usePage<SharedData>().props;
     const currentUser = auth.user;
-    const currentUrl = ziggy.location; // Use the URL from ziggy
+    const currentUrl = ziggy.location;
 
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -30,18 +30,29 @@ const Sidebar = () => {
         { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
         { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
     ];
+
     const adminLinks: NavLinkItem[] = [
         { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('facility-booking.overview') }] },
         { name: 'Student Concern', icon: ExclamationIcon, children: [{ name: 'Request Overview', href: route('student-concern.overview') }] },
         { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
     ];
+
     const studentLinks: NavLinkItem[] = [
-        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Facility', href: route('facility-booking.request') }] },
-        { name: 'Student Concern', icon: ExclamationIcon, children: [
-            { name: 'Concern Overview', href: route('student-concern.overview') },
-            { name: 'Incident Report', href: route('student-concern.lodge') },
-            { name: 'View Warnings', href: route('student-concern.warnings') },
-        ]},
+         {
+            name: 'Facility Booking', icon: DocumentReportIcon,
+            children: [
+                { name: 'Request Facility', href: route('facility-booking.request') },
+                { name: 'Request Overview', href: route('facility-booking.overview') }, // <-- THE FIX IS HERE
+            ],
+        },
+        {
+            name: 'Student Concern', icon: ExclamationIcon,
+            children: [
+                { name: 'Concern Overview', href: route('student-concern.overview') },
+                { name: 'Incident Report', href: route('student-concern.lodge') },
+                { name: 'View Warnings', href: route('student-concern.warnings') },
+            ],
+        },
     ];
 
     let navLinks: NavLinkItem[] = [...commonLinks];
@@ -50,13 +61,12 @@ const Sidebar = () => {
     } else if (currentUser.role === 'student') {
         navLinks = [...navLinks, ...studentLinks];
     }
-
-    // --- 2. UPDATE ACTIVE STATE CHECK TO USE `currentUrl` ---
+    
     const isParentActive = (children: { href: string }[] | undefined) => {
         if (!children) return false;
         return children.some(child => currentUrl.startsWith(child.href));
     };
-
+    
     useEffect(() => {
         const activeParent = navLinks.find(link => isParentActive(link.children));
         if (activeParent) {
@@ -70,7 +80,6 @@ const Sidebar = () => {
 
     return (
         <div className="flex flex-col h-screen w-64 bg-[#C83B51] text-white font-sans flex-shrink-0">
-            {/* Dynamic Profile Section */}
             <div className="flex items-center p-4 mt-4">
                 <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-[#C83B51] mr-4">
                     <UserIcon className="w-8 h-8" />
@@ -81,7 +90,6 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            {/* Navigation Links */}
             <nav className="flex-grow mt-8 px-4">
                 <ul>
                     {navLinks.map((link) => (
@@ -118,7 +126,6 @@ const Sidebar = () => {
                 </ul>
             </nav>
 
-            {/* Logout Section */}
             <div className="p-4 mb-4">
                 <Link href={route('logout')} method="post" as="button" className="w-full flex items-center p-3 rounded-lg transition-colors duration-200 hover:bg-[#B03448] hover:bg-opacity-50">
                     <LogoutIcon className="w-6 h-6 mr-4" />

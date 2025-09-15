@@ -60,6 +60,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     })->name('admin.dashboard');
 
     // All other admin-only routes can go here in the future
+    // ADD THIS ROUTE FOR THE NEW PAGE
+    Route::get('/admin/booking-overview', function () {
+        return Inertia::render('Admin/RequestOverview');
+    })->name('admin.booking-overview');
 });
 
 
