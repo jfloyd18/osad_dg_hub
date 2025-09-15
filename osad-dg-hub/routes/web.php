@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\OrganizationManagementController;
-use App\Http\Controllers\StudentConcernController; // 1. IMPORT THE NEW CONTROLLER
+use App\Http\Controllers\StudentConcernController;
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -15,6 +15,7 @@ Route::get('/home', function () {
     return Inertia::render('dashboard');
 })->name('home');
 
+// --- ROUTES FOR ALL LOGGED-IN USERS (STUDENTS AND ADMINS) ---
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -29,7 +30,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('FacilityBooking/Overview');
     })->name('facility-booking.overview');
 
-    // 2. REPLACED THE OLD ROUTES WITH THIS CLEANER GROUP
     // --- Student Concern Routes (Refactored to use a Controller) ---
     Route::prefix('student-concern')->name('student-concern.')->group(function () {
         Route::get('/overview', [StudentConcernController::class, 'showOverview'])->name('overview');
@@ -50,8 +50,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/calendar', function () {
         return Inertia::render('Calendar');
     })->name('calendar');
-
 });
+
+
+// --- ADMIN-ONLY ROUTES ---
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return Inertia::render('Admin/Dashboard');
+    })->name('admin.dashboard');
+
+    // All other admin-only routes can go here in the future
+});
+
 
 // Ensure these files exist and contain your authentication and settings routes.
 require __DIR__.'/settings.php';

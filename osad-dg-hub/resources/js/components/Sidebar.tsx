@@ -2,92 +2,67 @@ import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 // --- Icon Components ---
-const HomeIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-    </svg>
-);
-const CalendarIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-);
-const DocumentReportIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-);
-const ExclamationIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-    </svg>
-);
-const UserGroupIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.184-1.268-.5-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.184-1.268.5-1.857m0 0a3 3 0 014.5 0M12 12a3 3 0 100-6 3 3 0 000 6z" />
-    </svg>
-);
-const LogoutIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-    </svg>
-);
-const UserIcon = ({ className = "w-10 h-10" }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-    </svg>
-);
-const ChevronDownIcon = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-    </svg>
-);
-const WarningIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.857 2.38 2.332 1.574l2.923-1.574a6.75 6.75 0 006.75 0l2.923 1.574c1.475.79.866 2.332-.609 1.574L12 18.75m6-4.5c0 3.314-2.239 6-5 6h-1m-14 0h14" />
-    </svg>
-);
+const HomeIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> );
+const CalendarIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> );
+const DocumentReportIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> );
+const ExclamationIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> );
+const UserGroupIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.184-1.268-.5-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.184-1.268.5-1.857m0 0a3 3 0 014.5 0M12 12a3 3 0 100-6 3 3 0 000 6z" /></svg> );
+const LogoutIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> );
+const UserIcon = ({ className = "w-10 h-10" }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg> );
+const ChevronDownIcon = ({ className }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg> );
 
+type NavLinkItem = {
+    name: string;
+    icon: React.ComponentType<{ className?: string }>;
+    href?: string;
+    children?: { name: string; href: string }[];
+};
 
-// --- Sidebar Component ---
 const Sidebar = () => {
-    const { url } = usePage();
+    // --- 1. GET PROPS CORRECTLY ---
+    const { auth, ziggy } = usePage().props;
+    const currentUser = auth.user;
+    const currentUrl = ziggy.location; // Use the URL from ziggy
+
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-    const navLinks = [
-        { name: 'Dashboard', icon: HomeIcon, href: '/dashboard' },
-        { name: 'Calendar', icon: CalendarIcon, href: '/calendar' },
-        {
-            name: 'Facility Booking',
-            icon: DocumentReportIcon,
-            children: [
-                { name: 'Request Facility', href: '/facility-booking/request' },
-                { name: 'Request Overview', href: '/facility-booking/overview' },
-            ],
-        },
-        {
-            name: 'Student Concern',
-            icon: ExclamationIcon,
-            children: [
-                { name: 'Concern Overview', href: '/student-concern/overview' },
-                { name: 'Incident Report', href: '/student-concern/lodge' },
-                { name: 'View Warnings', href: '/student-concern/warnings', icon: WarningIcon}, // New link for View Warnings
-            ],
-        },
-        { name: 'Organization Management', icon: UserGroupIcon, href: '/organization-management' },
+    const commonLinks: NavLinkItem[] = [
+        { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
+        { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
+    ];
+    const adminLinks: NavLinkItem[] = [
+        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('facility-booking.overview') }] },
+        { name: 'Student Concern', icon: ExclamationIcon, children: [{ name: 'Request Overview', href: route('student-concern.overview') }] },
+        { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
+    ];
+    const studentLinks: NavLinkItem[] = [
+        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Facility', href: route('facility-booking.request') }] },
+        { name: 'Student Concern', icon: ExclamationIcon, children: [
+            { name: 'Concern Overview', href: route('student-concern.overview') },
+            { name: 'Incident Report', href: route('student-concern.lodge') },
+            { name: 'View Warnings', href: route('student-concern.warnings') },
+        ]},
     ];
 
+    let navLinks: NavLinkItem[] = [...commonLinks];
+    if (currentUser.role === 'admin') {
+        navLinks = [...navLinks, ...adminLinks];
+    } else if (currentUser.role === 'student') {
+        navLinks = [...navLinks, ...studentLinks];
+    }
+
+    // --- 2. UPDATE ACTIVE STATE CHECK TO USE `currentUrl` ---
     const isParentActive = (children: { href: string }[] | undefined) => {
-        return children?.some(child => url.startsWith(child.href));
+        if (!children) return false;
+        return children.some(child => currentUrl.startsWith(child.href));
     };
-    
+
     useEffect(() => {
         const activeParent = navLinks.find(link => isParentActive(link.children));
         if (activeParent) {
             setOpenMenu(activeParent.name);
         }
-    }, [url]);
-
+    }, [currentUrl, navLinks]);
 
     const handleMenuClick = (name: string) => {
         setOpenMenu(openMenu === name ? null : name);
@@ -95,14 +70,14 @@ const Sidebar = () => {
 
     return (
         <div className="flex flex-col h-screen w-64 bg-[#C83B51] text-white font-sans flex-shrink-0">
-            {/* Profile Section */}
+            {/* Dynamic Profile Section */}
             <div className="flex items-center p-4 mt-4">
                 <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-[#C83B51] mr-4">
                     <UserIcon className="w-8 h-8" />
                 </div>
                 <div>
-                    <h2 className="text-lg font-bold">Sarah Johnson</h2>
-                    <p className="text-sm">Drama Club Rep</p>
+                    <h2 className="text-lg font-bold">{currentUser.name}</h2>
+                    <p className="text-sm capitalize">{currentUser.role === 'admin' ? 'Administrator' : currentUser.role}</p>
                 </div>
             </div>
 
@@ -113,14 +88,7 @@ const Sidebar = () => {
                         <li key={link.name} className="mb-2">
                             {link.children ? (
                                 <>
-                                    <button
-                                        onClick={() => handleMenuClick(link.name)}
-                                        className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${
-                                            isParentActive(link.children)
-                                                ? 'bg-[#B03448]'
-                                                : 'hover:bg-[#B03448] hover:bg-opacity-50'
-                                        }`}
-                                    >
+                                    <button onClick={() => handleMenuClick(link.name)} className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${isParentActive(link.children) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
                                         <div className="flex items-center">
                                             <link.icon className="w-6 h-6 mr-4" />
                                             <span className="font-medium">{link.name}</span>
@@ -131,14 +99,7 @@ const Sidebar = () => {
                                         <ul className="pl-8 mt-2 space-y-2">
                                             {link.children.map((child) => (
                                                 <li key={child.name}>
-                                                    <Link
-                                                        href={child.href}
-                                                        className={`block p-2 rounded-md text-sm transition-colors duration-200 ${
-                                                            url.startsWith(child.href)
-                                                                ? 'bg-[#9d2f41]'
-                                                                : 'hover:bg-[#B03448] hover:bg-opacity-50'
-                                                        }`}
-                                                    >
+                                                    <Link href={child.href} className={`block p-2 rounded-md text-sm transition-colors duration-200 ${currentUrl.startsWith(child.href) ? 'bg-[#9d2f41]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
                                                         {child.name}
                                                     </Link>
                                                 </li>
@@ -147,14 +108,7 @@ const Sidebar = () => {
                                     )}
                                 </>
                             ) : (
-                                <Link
-                                    href={link.href!}
-                                    className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
-                                        url.startsWith(link.href!)
-                                            ? 'bg-[#B03448]'
-                                            : 'hover:bg-[#B03448] hover:bg-opacity-50'
-                                    }`}
-                                >
+                                <Link href={link.href!} className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${currentUrl.startsWith(link.href!) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
                                     <link.icon className="w-6 h-6 mr-4" />
                                     <span className="font-medium">{link.name}</span>
                                 </Link>
@@ -166,12 +120,7 @@ const Sidebar = () => {
 
             {/* Logout Section */}
             <div className="p-4 mb-4">
-                <Link
-                    href={route('logout')}
-                    method="post"
-                    as="button"
-                    className="w-full flex items-center p-3 rounded-lg transition-colors duration-200 hover:bg-[#B03448] hover:bg-opacity-50"
-                >
+                <Link href={route('logout')} method="post" as="button" className="w-full flex items-center p-3 rounded-lg transition-colors duration-200 hover:bg-[#B03448] hover:bg-opacity-50">
                     <LogoutIcon className="w-6 h-6 mr-4" />
                     <span className="font-medium">Logout</span>
                 </Link>
