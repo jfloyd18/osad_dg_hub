@@ -4,19 +4,29 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    public function handle(Request $request, Closure $next): Response
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle(Request $request, Closure $next)
     {
-        // Check if the user is logged in and is an admin
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            // If not, block access.
-            abort(403, 'Unauthorized Action.');
+        // Check if user is authenticated and is an admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            // If it's an API request, return JSON response
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
+            }
+            
+            // Otherwise redirect to dashboard with error message
+            return redirect()->route('dashboard')->with('error', 'You do not have admin access.');
         }
 
-        // If they are an admin, let them proceed.
         return $next($request);
     }
 }

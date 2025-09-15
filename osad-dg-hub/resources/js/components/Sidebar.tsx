@@ -32,7 +32,7 @@ const Sidebar = () => {
     ];
 
     const adminLinks: NavLinkItem[] = [
-        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('facility-booking.overview') }] },
+        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
         { name: 'Student Concern', icon: ExclamationIcon, children: [{ name: 'Request Overview', href: route('student-concern.overview') }] },
         { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
     ];

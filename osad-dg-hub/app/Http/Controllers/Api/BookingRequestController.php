@@ -3,130 +3,127 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\BookingRequest;
+use App\Models\User;
 use App\Models\Facility;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class BookingRequestController extends Controller
 {
-    public function facilities()
+    private function getPlaceholderUser()
     {
-        try {
-            $facilities = Facility::orderBy('name')->get();
-            return response()->json($facilities);
-        } catch (\Exception $e) {
-            Log::error('Failed to retrieve facilities', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Failed to retrieve facilities'], 500);
+        $user = User::first();
+        if (!$user) {
+            abort(404, 'No users found in the database.');
         }
+        return $user;
+    }
+
+    public function index()
+    {
+        $user = $this->getPlaceholderUser();
+        return $user->bookingRequests()->orderBy('created_at', 'desc')->get();
     }
 
     public function stats()
     {
-        $stats = [
-            'total' => BookingRequest::count(),
-            'pending' => BookingRequest::where('status', 'Pending')->count(),
-            'approved' => BookingRequest::where('status', 'Approved')->count(),
-            'rejected' => BookingRequest::where('status', 'Rejected')->count(),
-        ];
-        return response()->json($stats);
+        $user = $this->getPlaceholderUser();
+        return response()->json([
+            'total' => $user->bookingRequests()->count(),
+            'pending' => $user->bookingRequests()->where('status', 'Pending')->count(),
+            'approved' => $user->bookingRequests()->where('status', 'Approved')->count(),
+            'rejected' => $user->bookingRequests()->where('status', 'Rejected')->count(),
+        ]);
     }
-
-    // app/Http/Controllers/Api/BookingRequestController.php
-
-    // app/Http/Controllers/Api/BookingRequestController.php
-
-public function index()
-{
-    // Check if a user is logged in
-    if (Auth::check()) {
-        // If logged in, get their specific requests
-        $user = Auth::user();
-        $requests = BookingRequest::where('user_id', $user->id)
-                                    ->latest('submitted_at')
-                                    ->take(10)
-                                    ->get();
-    } else {
-        // --- THIS IS THE CHANGE ---
-        // If not logged in, get the 10 most recent requests from ALL users.
-        $requests = BookingRequest::latest('submitted_at')
-                                    ->take(10)
-                                    ->get();
-    }
-
-    return response()->json($requests);
-}
 
     public function mostBooked()
     {
-        $facilities = BookingRequest::select('facility_name as name', DB::raw('count(*) as bookings'))
-            ->where('status', 'Approved')
+        $user = $this->getPlaceholderUser();
+        $mostBooked = $user->bookingRequests()
+            ->select('facility_name', DB::raw('count(*) as bookings'))
             ->groupBy('facility_name')
             ->orderBy('bookings', 'desc')
-            ->take(5)
+            ->limit(3)
             ->get();
-        return response()->json($facilities);
+        return response()->json($mostBooked);
     }
 
+    /**
+     * Store a newly created booking request in storage.
+     */
     public function store(Request $request)
     {
-        Log::info('Incoming booking request', $request->all());
-
+        // Validate the incoming request
         $validator = Validator::make($request->all(), [
-            'department' => 'nullable|string|max:255',
-            'organization' => 'nullable|string|max:255',
+            'department' => 'required|string|max:255',
+            'organization' => 'required|string|max:255',
             'contact_no' => 'required|string|max:20',
             'event_name' => 'required|string|max:255',
-            'facility_name' => 'required|string|exists:facilities,name',
+            'facility_id' => 'required|integer|exists:facilities,id',
             'estimated_people' => 'required|integer|min:1',
-            'event_start' => 'required|date',
-            'event_end' => 'required|date|after_or_equal:event_start',
-            'purpose' => 'required|string|min:5',
+            'event_start_date' => 'required|date_format:Y-m-d',
+            'event_start_time' => 'required|date_format:H:i',
+            'event_end_date' => 'required|date_format:Y-m-d',
+            'event_end_time' => 'required|date_format:H:i',
+            'purpose' => 'required|string',
         ]);
 
         if ($validator->fails()) {
-            Log::warning('Validation failed', $validator->errors()->toArray());
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $validator->validated();
-
         try {
-            $facility = Facility::where('name', $data['facility_name'])->firstOrFail();
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Facility not found', ['name' => $data['facility_name']]);
-            return response()->json(['message' => 'The selected facility could not be found.'], 404);
-        }
+            // Combine date and time into datetime format
+            $startDateTime = Carbon::parse($request->input('event_start_date') . ' ' . $request->input('event_start_time'));
+            $endDateTime = Carbon::parse($request->input('event_end_date') . ' ' . $request->input('event_end_time'));
 
-        $bookingData = [
-            // --- CHANGE: Use the logged-in user's ID, or default to 1 for guests ---
-            'user_id' => Auth::id() ?? 1,
-            'department' => $data['department'] ?? null,
-            'organization' => $data['organization'] ?? null,
-            'contact_no' => $data['contact_no'],
-            'event_name' => $data['event_name'],
-            'facility_id' => $facility->id,
-            'facility_name' => $data['facility_name'],
-            'estimated_people' => $data['estimated_people'],
-            'event_start' => $data['event_start'],
-            'event_end' => $data['event_end'],
-            'purpose' => $data['purpose'],
-            'status' => 'Pending',
-            'submitted_at' => now(),
-        ];
+            // Validate that end time is after start time
+            if ($endDateTime->lte($startDateTime)) {
+                return response()->json([
+                    'errors' => ['event_end_time' => ['Event end time must be after start time']]
+                ], 422);
+            }
 
-        try {
-            $bookingRequest = BookingRequest::create($bookingData);
+            // Get the facility name from the facility_id
+            $facility = Facility::find($request->input('facility_id'));
+            if (!$facility) {
+                return response()->json([
+                    'errors' => ['facility_id' => ['Selected facility not found']]
+                ], 422);
+            }
+
+            // Create the booking request
+            $bookingRequest = BookingRequest::create([
+                'user_id' => $this->getPlaceholderUser()->id,
+                'department' => $request->input('department'),
+                'organization' => $request->input('organization'),
+                'contact_no' => $request->input('contact_no'),
+                'event_name' => $request->input('event_name'),
+                'facility_id' => $request->input('facility_id'),
+                'facility_name' => $facility->name, // Add facility name
+                'estimated_people' => $request->input('estimated_people'),
+                'event_start' => $startDateTime->format('Y-m-d H:i:s'),
+                'event_end' => $endDateTime->format('Y-m-d H:i:s'),
+                'purpose' => $request->input('purpose'),
+                'status' => 'Pending',
+                'submitted_at' => now(),
+            ]);
+
             return response()->json([
                 'message' => 'Booking request submitted successfully!',
                 'data' => $bookingRequest
             ], 201);
+
         } catch (\Exception $e) {
-            Log::error('Failed to create booking request', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Failed to create booking request', 'error' => $e->getMessage()], 500);
+            \Log::error('Booking request error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

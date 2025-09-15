@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\OrganizationManagementController;
 use App\Http\Controllers\StudentConcernController;
+use App\Http\Controllers\Admin\FacilityBookingPageController;
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -41,11 +41,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/warnings', [StudentConcernController::class, 'showWarnings'])->name('warnings');
     });
 
-    // The line below was causing the error because the controller does not exist yet.
-    // It has been commented out to allow the application to run.
-    // Route::get('organization-management', [OrganizationManagementController::class, 'index'])
-    //       ->name('organization-management');
-
     // --- Placeholder route for Calendar ---
     Route::get('/calendar', function () {
         return Inertia::render('Calendar');
@@ -53,17 +48,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// --- ADMIN-ONLY ROUTES ---
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
+// --- ADMIN-ONLY ROUTES (Using inline check instead of middleware) ---
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        // Check if user is admin inline
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
+        }
         return Inertia::render('Admin/Dashboard');
-    })->name('admin.dashboard');
+    })->name('dashboard');
 
-    // All other admin-only routes can go here in the future
-    // ADD THIS ROUTE FOR THE NEW PAGE
-    Route::get('/admin/booking-overview', function () {
-        return Inertia::render('Admin/RequestOverview');
-    })->name('admin.booking-overview');
+    Route::get('/facility-booking/overview', function () {
+        // Check if user is admin inline
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
+        }
+        
+        // Call the controller method
+        $controller = new FacilityBookingPageController();
+        return $controller->overview();
+    })->name('facility-booking.overview');
+    
 });
 
 

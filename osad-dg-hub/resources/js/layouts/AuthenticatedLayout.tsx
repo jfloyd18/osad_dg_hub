@@ -1,17 +1,25 @@
 import React, { PropsWithChildren } from 'react';
-import Sidebar from '@/components/Sidebar'; // Assuming path is 'resources/js/components/Sidebar.tsx'
-import Header from '@/components/Header';   // Assuming path is 'resources/js/components/Header.tsx'
+import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
 
-// The 'children' prop will be the actual page content passed from Inertia
 const AuthenticatedLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      {/* Fixed Sidebar */}
+      <div className="flex-shrink-0">
+        <Sidebar />
+      </div>
+      
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Fixed Header */}
         <Header />
-        {/* The main content of your page will be rendered here */}
-        <main className="p-8 flex-1">
-          {children}
+        
+        {/* Scrollable Main Content */}
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
