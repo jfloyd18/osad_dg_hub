@@ -13,11 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // This keeps your original test user creation
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);
+
+        // This adds the calls to our new seeders
+        $this->call([
+            FacilitySeeder::class,
+            BookingRequestSeeder::class,
         ]);
     }
 }

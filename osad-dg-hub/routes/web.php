@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\OrganizationManagementController;
+use App\Http\Controllers\StudentConcernController; // 1. IMPORT THE NEW CONTROLLER
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -28,19 +29,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('FacilityBooking/Overview');
     })->name('facility-booking.overview');
 
-    // --- Student Concern Routes ---
-    Route::get('/student-concern/overview', function () {
-        return Inertia::render('StudentConcern/Overview');
-    })->name('student-concern.overview');
+    // 2. REPLACED THE OLD ROUTES WITH THIS CLEANER GROUP
+    // --- Student Concern Routes (Refactored to use a Controller) ---
+    Route::prefix('student-concern')->name('student-concern.')->group(function () {
+        Route::get('/overview', [StudentConcernController::class, 'showOverview'])->name('overview');
+        
+        // This 'lodge' route now renders your 'IncidentReportPage' component
+        Route::get('/lodge', [StudentConcernController::class, 'showIncidentReportForm'])->name('lodge'); 
+        
+        // This 'warnings' route now renders your 'ViewWarningsPage' component
+        Route::get('/warnings', [StudentConcernController::class, 'showWarnings'])->name('warnings');
+    });
 
-    Route::get('/student-concern/lodge', function () {
-        // You will need to create a 'StudentConcern/Lodge.tsx' component for this page
-        return Inertia::render('StudentConcern/Lodge');
-    })->name('student-concern.lodge');
-
-
-    Route::get('organization-management', [OrganizationManagementController::class, 'index'])
-        ->name('organization-management');
+    // The line below was causing the error because the controller does not exist yet.
+    // It has been commented out to allow the application to run.
+    // Route::get('organization-management', [OrganizationManagementController::class, 'index'])
+    //       ->name('organization-management');
 
     // --- Placeholder route for Calendar ---
     Route::get('/calendar', function () {

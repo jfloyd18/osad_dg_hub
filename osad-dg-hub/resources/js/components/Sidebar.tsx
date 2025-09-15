@@ -38,9 +38,14 @@ const UserIcon = ({ className = "w-10 h-10" }: { className?: string }) => (
     </svg>
 );
 const ChevronDownIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
-    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+    </svg>
+);
+const WarningIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.857 2.38 2.332 1.574l2.923-1.574a6.75 6.75 0 006.75 0l2.923 1.574c1.475.79.866 2.332-.609 1.574L12 18.75m6-4.5c0 3.314-2.239 6-5 6h-1m-14 0h14" />
+    </svg>
 );
 
 
@@ -66,6 +71,7 @@ const Sidebar = () => {
             children: [
                 { name: 'Concern Overview', href: '/student-concern/overview' },
                 { name: 'Incident Report', href: '/student-concern/lodge' },
+                { name: 'View Warnings', href: '/student-concern/warnings', icon: WarningIcon}, // New link for View Warnings
             ],
         },
         { name: 'Organization Management', icon: UserGroupIcon, href: '/organization-management' },
