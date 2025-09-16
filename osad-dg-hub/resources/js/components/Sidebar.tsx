@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { SharedData } from '@/types'; // Assumes your types are in resources/js/types/index.d.ts
 
-// --- Icon Components ---
+// --- Icon Components (no changes) ---
 const HomeIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> );
 const CalendarIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> );
 const DocumentReportIcon = ({ className = 'w-6 h-6' }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> );
@@ -24,8 +24,7 @@ const Sidebar = () => {
     const currentUser = auth.user;
     const currentUrl = ziggy.location;
 
-    const [openMenu, setOpenMenu] = useState<string | null>(null);
-
+    // --- FIX: DEFINE NAVIGATION LINKS *BEFORE* USING THEM ---
     const commonLinks: NavLinkItem[] = [
         { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
         { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
@@ -38,11 +37,11 @@ const Sidebar = () => {
     ];
 
     const studentLinks: NavLinkItem[] = [
-         {
+        {
             name: 'Facility Booking', icon: DocumentReportIcon,
             children: [
                 { name: 'Request Facility', href: route('facility-booking.request') },
-                { name: 'Request Overview', href: route('facility-booking.overview') }, // <-- THE FIX IS HERE
+                { name: 'Request Overview', href: route('facility-booking.overview') },
             ],
         },
         {
@@ -55,25 +54,37 @@ const Sidebar = () => {
         },
     ];
 
-    let navLinks: NavLinkItem[] = [...commonLinks];
-    if (currentUser.role === 'admin') {
-        navLinks = [...navLinks, ...adminLinks];
-    } else if (currentUser.role === 'student') {
-        navLinks = [...navLinks, ...studentLinks];
-    }
+    // This creates the final navLinks array based on user role
+    const navLinks: NavLinkItem[] = [
+        ...commonLinks,
+        ...(currentUser.role === 'admin' ? adminLinks : []),
+        ...(currentUser.role === 'student' ? studentLinks : []),
+    ];
+
+    // --- ENHANCED STATE LOGIC ---
+    const getActiveCategory = () => {
+        const activeParent = navLinks.find(link => 
+            link.children?.some(child => currentUrl.startsWith(child.href))
+        );
+        return activeParent?.name || null;
+    };
+
+    const [openMenu, setOpenMenu] = useState<string | null>(getActiveCategory);
     
+    useEffect(() => {
+        const activeCategory = getActiveCategory();
+        // This condition ensures the menu only re-opens if you navigate to a NEW category.
+        if (activeCategory && activeCategory !== openMenu) {
+            setOpenMenu(activeCategory);
+        }
+    }, [currentUrl]);
+    // --- END OF ENHANCEMENT ---
+
     const isParentActive = (children: { href: string }[] | undefined) => {
         if (!children) return false;
         return children.some(child => currentUrl.startsWith(child.href));
     };
     
-    useEffect(() => {
-        const activeParent = navLinks.find(link => isParentActive(link.children));
-        if (activeParent) {
-            setOpenMenu(activeParent.name);
-        }
-    }, [currentUrl, navLinks]);
-
     const handleMenuClick = (name: string) => {
         setOpenMenu(openMenu === name ? null : name);
     };

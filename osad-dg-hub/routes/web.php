@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentConcernController;
 use App\Http\Controllers\Admin\FacilityBookingPageController;
+use App\Http\Controllers\Api\AdminBookingController; // <-- 1. IMPORT THE CONTROLLER
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -69,6 +70,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         $controller = new FacilityBookingPageController();
         return $controller->overview();
     })->name('facility-booking.overview');
+    
+    // --- FIX IS HERE: ADDED THE MISSING PATCH ROUTE ---
+    // 2. This route handles the PATCH request to update the booking status.
+    Route::patch('/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus'])
+         ->name('booking-requests.updateStatus');
     
 });
 

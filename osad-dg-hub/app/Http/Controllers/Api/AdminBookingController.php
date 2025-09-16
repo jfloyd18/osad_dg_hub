@@ -78,9 +78,6 @@ class AdminBookingController extends Controller
 
         $bookingRequest->save();
 
-        return response()->json([
-            'message' => 'Booking request status updated successfully',
-            'data' => $bookingRequest,
-        ]);
+        return redirect()->back()->with('success', 'Booking request status updated successfully!');
     }
 }

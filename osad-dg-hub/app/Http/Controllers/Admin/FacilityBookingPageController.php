@@ -42,19 +42,15 @@ class FacilityBookingPageController extends Controller
                 ];
             });
 
-        // Get most booked facilities
-        $mostBooked = BookingRequest::select('facility_id', DB::raw('COUNT(*) as bookings'))
-            ->groupBy('facility_id')
-            ->orderBy('bookings', 'desc')
-            ->take(5)
-            ->with('facility')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'facility_name' => $item->facility->facility_name ?? 'Unknown Facility',
-                    'bookings' => $item->bookings,
-                ];
-            });
+        // --- FIX IS HERE ---
+        // Get most booked facilities with a proper JOIN
+        $mostBooked = BookingRequest::query()
+            ->join('facilities', 'booking_requests.facility_id', '=', 'facilities.id')
+            ->select('facilities.name as facility_name', DB::raw('count(booking_requests.id) as bookings'))
+            ->groupBy('facilities.name')
+            ->orderByDesc('bookings')
+            ->limit(5)
+            ->get();
 
         return Inertia::render('Admin/FacilityBooking/Overview', [
             'stats' => $stats,
