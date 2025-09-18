@@ -3,8 +3,13 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import apiClient from '../../lib/api';
 
-// Define the shape of a Facility object
+// --- Type Definitions ---
 interface Facility {
+    id: number;
+    name: string;
+}
+
+interface Organization {
     id: number;
     name: string;
 }
@@ -13,7 +18,7 @@ interface Facility {
 const RequestFacilityPage = () => {
     const { data, setData, post, processing, errors, recentlySuccessful, reset } = useForm({
         department: '',
-        organization: '',
+        organization: '', // This will now store the organization name
         contact_no: '',
         event_name: '',
         facility_id: '',
@@ -26,6 +31,7 @@ const RequestFacilityPage = () => {
     });
 
     const [facilities, setFacilities] = useState<Facility[]>([]);
+    const [organizations, setOrganizations] = useState<Organization[]>([]); // State for organizations
     const [fetchError, setFetchError] = useState<string | null>(null);
 
     // --- LOGIC FOR DATE/TIME CONSTRAINTS ---
@@ -33,18 +39,26 @@ const RequestFacilityPage = () => {
     const todayDateString = today.toISOString().split('T')[0];
     const currentTimeString = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
     
+    // --- UPDATED: Fetch both facilities and organizations ---
     useEffect(() => {
-        apiClient.get('/api/facilities')
-            .then(response => setFacilities(response.data))
-            .catch(err => {
-                setFetchError('Could not load facility options.');
-                console.error("Facility fetch error:", err);
-            });
+        const fetchData = async () => {
+            try {
+                const [facilitiesRes, organizationsRes] = await Promise.all([
+                    apiClient.get('/api/facilities'),
+                    apiClient.get('/api/organizations')
+                ]);
+                setFacilities(facilitiesRes.data);
+                setOrganizations(organizationsRes.data);
+            } catch (err) {
+                setFetchError('Could not load booking options. Please try again later.');
+                console.error("Data fetch error:", err);
+            }
+        };
+        fetchData();
     }, []);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // NOTE: Make sure you have a 'facility-booking.request.store' route in your web.php
         post(route('facility-booking.request.store'), {
             onSuccess: () => reset(),
         });
@@ -90,7 +104,6 @@ const RequestFacilityPage = () => {
                          <strong>Success:</strong> Your request has been submitted successfully!
                      </div>
                 )}
-                {/* --- FIX IS HERE: Changed how the first error is accessed --- */}
                 {Object.keys(errors).length > 0 && (
                     <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md">
                         <strong>Error:</strong> {Object.values(errors)[0]}
@@ -111,10 +124,24 @@ const RequestFacilityPage = () => {
                                     <option value="College of Business Education">College of Business Education</option>
                                 </select>
                             </div>
+                            
+                            {/* --- FIX IS HERE: DYNAMIC ORGANIZATION DROPDOWN --- */}
                             <div>
                                 <label htmlFor="organization" className="block text-sm font-medium text-gray-700">Club/Organization <span className="text-red-500">*</span></label>
-                                <input type="text" id="organization" value={data.organization} onChange={(e) => setData('organization', e.target.value)} required className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+                                <select 
+                                    id="organization" 
+                                    value={data.organization} 
+                                    onChange={(e) => setData('organization', e.target.value)} 
+                                    required 
+                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
+                                >
+                                    <option value="">Select Organization</option>
+                                    {organizations.map(org => (
+                                        <option key={org.id} value={org.name}>{org.name}</option>
+                                    ))}
+                                </select>
                             </div>
+
                             <div>
                                 <label htmlFor="contact-no" className="block text-sm font-medium text-gray-700">Contact No. <span className="text-red-500">*</span></label>
                                 <input type="tel" id="contact-no" value={data.contact_no} onChange={(e) => setData('contact_no', e.target.value)} required placeholder="ex. 09123456789" className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />

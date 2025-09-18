@@ -38,7 +38,6 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             
-            // --- MODIFIED SECTION ---
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
@@ -47,7 +46,14 @@ class HandleInertiaRequests extends Middleware
                     'role' => $request->user()->role, // The user's role is now shared
                 ] : null,
             ],
-            // --- END OF MODIFICATION ---
+            
+            // --- FIX IS HERE: ADD THIS 'flash' ARRAY ---
+            // This shares session flash messages with every Inertia response.
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
+            // --- END OF FIX ---
 
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
@@ -57,3 +63,4 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 }
+

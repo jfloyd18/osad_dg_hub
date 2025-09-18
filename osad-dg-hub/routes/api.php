@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\BookingRequestController;
 use App\Http\Controllers\Api\ConcernController;
 use App\Http\Controllers\Api\WarningSlipController;
+use App\Http\Controllers\Api\OrganizationController;
 
 // --- Authenticated user endpoint (leave as-is) ---
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -20,7 +21,7 @@ Route::get('/requests', [BookingRequestController::class, 'index']);
 Route::post('/requests', [BookingRequestController::class, 'store']);
 Route::get('/facilities/most-booked', [BookingRequestController::class, 'mostBooked']);
 Route::get('/facilities', [\App\Http\Controllers\Api\FacilityController::class, 'index']);
-
+Route::get('/organizations', [OrganizationController::class, 'index']); 
 
 // --- ADMIN API ROUTES (Temporarily Public for Testing) ---
 Route::get('/admin/dashboard-data', [AdminDashboardController::class, 'getData']);

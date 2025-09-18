@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 
-// --- Define Types for Props ---
+// --- Type Definitions ---
 interface Facility {
     id: number;
     name: string;
@@ -23,8 +23,34 @@ interface PageProps {
     facilities: Facility[];
 }
 
+// --- Reusable Success Modal Component ---
+const SuccessModal = ({ message, onClose }: { message: string, onClose: () => void }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+        <div className="bg-white p-8 rounded-lg max-w-sm w-full shadow-xl text-center">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">SUCCESS!</h2>
+            <p className="text-gray-600 mb-6">{message}</p>
+            <button
+                onClick={onClose}
+                className="w-full px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+                Continue
+            </button>
+        </div>
+    </div>
+);
+
+
 // --- Main Component ---
-const ShowBookingRequest = ({ request, facilities }: PageProps) => { // <-- FIX IS HERE
+const ShowBookingRequest = ({ request, facilities }: PageProps) => {
+    // --- FIX IS HERE: Changed how flash messages are accessed ---
+    const { flash } = usePage().props as any;
+    const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
+    
     const isEditable = request.status === 'Pending';
 
     const { data, setData, put, processing, errors } = useForm({
@@ -32,6 +58,12 @@ const ShowBookingRequest = ({ request, facilities }: PageProps) => { // <-- FIX 
         facility_id: request.facility_id,
         purpose: request.purpose,
     });
+
+    useEffect(() => {
+        if (flash?.success) {
+            setSuccessModalOpen(true);
+        }
+    }, [flash]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -42,6 +74,11 @@ const ShowBookingRequest = ({ request, facilities }: PageProps) => { // <-- FIX 
     return (
         <AuthenticatedLayout>
             <Head title={isEditable ? 'Edit Request' : 'View Request'} />
+
+            {isSuccessModalOpen && flash?.success && (
+                <SuccessModal message={flash.success} onClose={() => setSuccessModalOpen(false)} />
+            )}
+
             <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
                 <header className="border-b pb-4 mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">{isEditable ? 'Edit Request' : 'View Request Details'}</h1>

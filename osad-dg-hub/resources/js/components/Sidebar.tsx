@@ -24,7 +24,6 @@ const Sidebar = () => {
     const currentUser = auth.user;
     const currentUrl = ziggy.location;
 
-    // --- FIX: DEFINE NAVIGATION LINKS *BEFORE* USING THEM ---
     const commonLinks: NavLinkItem[] = [
         { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
         { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
@@ -32,7 +31,14 @@ const Sidebar = () => {
 
     const adminLinks: NavLinkItem[] = [
         { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
-        { name: 'Student Concern', icon: ExclamationIcon, children: [{ name: 'Request Overview', href: route('student-concern.overview') }] },
+        { 
+            name: 'Student Concern', 
+            icon: ExclamationIcon, 
+            children: [
+                { name: 'Request Overview', href: route('student-concern.overview') },
+                { name: 'Issue Warning Slip', href: route('admin.warning-slip.create') }
+            ] 
+        },
         { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
     ];
 
@@ -50,7 +56,6 @@ const Sidebar = () => {
                 { name: 'Concern Overview', href: route('student-concern.overview') },
                 { name: 'Incident Report', href: route('student-concern.lodge') },
                 { name: 'View Warnings', href: route('student-concern.warnings') },
-                { name: 'Warning Slip', href: route('student-concern.warning-slip.create') },
             ],
         },
     ];
@@ -74,7 +79,6 @@ const Sidebar = () => {
     
     useEffect(() => {
         const activeCategory = getActiveCategory();
-        // This condition ensures the menu only re-opens if you navigate to a NEW category.
         if (activeCategory && activeCategory !== openMenu) {
             setOpenMenu(activeCategory);
         }
@@ -148,4 +152,3 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
