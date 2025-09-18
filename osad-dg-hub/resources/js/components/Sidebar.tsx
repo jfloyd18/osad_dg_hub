@@ -36,7 +36,7 @@ const Sidebar = () => {
             icon: ExclamationIcon, 
             children: [
                 { name: 'Request Overview', href: route('student-concern.overview') },
-                { name: 'Issue Warning Slip', href: route('admin.warning-slip.create') }
+                { name: 'Create Warning Slip', href: route('admin.warning-slip.create') }
             ] 
         },
         { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
@@ -60,14 +60,12 @@ const Sidebar = () => {
         },
     ];
 
-    // This creates the final navLinks array based on user role
     const navLinks: NavLinkItem[] = [
         ...commonLinks,
         ...(currentUser.role === 'admin' ? adminLinks : []),
         ...(currentUser.role === 'student' ? studentLinks : []),
     ];
 
-    // --- ENHANCED STATE LOGIC ---
     const getActiveCategory = () => {
         const activeParent = navLinks.find(link => 
             link.children?.some(child => currentUrl.startsWith(child.href))
@@ -83,7 +81,6 @@ const Sidebar = () => {
             setOpenMenu(activeCategory);
         }
     }, [currentUrl]);
-    // --- END OF ENHANCEMENT ---
 
     const isParentActive = (children: { href: string }[] | undefined) => {
         if (!children) return false;
@@ -151,4 +148,6 @@ const Sidebar = () => {
         </div>
     );
 };
+
+export default Sidebar;
 
