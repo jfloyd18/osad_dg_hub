@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\StudentConcernController;
 use App\Http\Controllers\Admin\FacilityBookingPageController;
 use App\Http\Controllers\Api\AdminBookingController; // <-- 1. IMPORT THE CONTROLLER
+use App\Http\Controllers\Api\WarningSlipController;
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -38,8 +39,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // This 'lodge' route now renders your 'IncidentReportPage' component
         Route::get('/lodge', [StudentConcernController::class, 'showIncidentReportForm'])->name('lodge'); 
         
+        Route::post('/lodge', [StudentConcernController::class, 'store'])->name('store');
+
         // This 'warnings' route now renders your 'ViewWarningsPage' component
         Route::get('/warnings', [StudentConcernController::class, 'showWarnings'])->name('warnings');
+
+        // --- ADD THESE NEW ROUTES FOR THE STUDENT WARNING SLIP FORM ---
+        Route::get('/warning-slip', [StudentConcernController::class, 'showWarningSlipForm'])->name('warning-slip.create');
+        Route::post('/warning-slip', [StudentConcernController::class, 'storeWarningSlip'])->name('warning-slip.store');
+    
+       
     });
 
     // --- Placeholder route for Calendar ---

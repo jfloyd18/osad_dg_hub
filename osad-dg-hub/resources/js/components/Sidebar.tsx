@@ -50,6 +50,7 @@ const Sidebar = () => {
                 { name: 'Concern Overview', href: route('student-concern.overview') },
                 { name: 'Incident Report', href: route('student-concern.lodge') },
                 { name: 'View Warnings', href: route('student-concern.warnings') },
+                { name: 'Warning Slip', href: route('student-concern.warning-slip.create') },
             ],
         },
     ];

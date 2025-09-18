@@ -29,6 +29,10 @@ Route::patch('/admin/booking-requests/{bookingRequest}/status', [AdminBookingCon
 Route::get('/concerns/overview', [ConcernController::class, 'overview']);
 
 
+// --- FIX IS HERE: The POST route is now public ---
+Route::post('/concerns/create', [ConcernController::class, 'store']);
+
+
 // --- Protected routes (require login) ---
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -36,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // --- USER-SPECIFIC STUDENT CONCERN ROUTES ---
     Route::prefix('concerns')->group(function () {
-        Route::post('/create', [ConcernController::class, 'store']);
+        // The POST /create route has been moved out of this group to be public
     });
 
     // --- USER-SPECIFIC WARNING SLIP ROUTES ---
