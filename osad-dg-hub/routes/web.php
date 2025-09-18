@@ -4,8 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentConcernController;
 use App\Http\Controllers\Admin\FacilityBookingPageController;
-use App\Http\Controllers\Api\AdminBookingController; // <-- 1. IMPORT THE CONTROLLER
+use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\Api\WarningSlipController;
+use App\Http\Controllers\BookingRequestController; // <-- ADD THIS IMPORT
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -27,10 +28,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/facility-booking/request', function () {
         return Inertia::render('FacilityBooking/Request');
     })->name('facility-booking.request');
+    
+    // ADDED: Route to handle form submission from the request page
+    Route::post('/facility-booking/request', [BookingRequestController::class, 'store'])->name('facility-booking.request.store');
 
-    Route::get('/facility-booking/overview', function () {
-        return Inertia::render('FacilityBooking/Overview');
-    })->name('facility-booking.overview');
+    // UPDATED: Point overview to the controller to fetch data
+    Route::get('/facility-booking/overview', [BookingRequestController::class, 'index'])->name('facility-booking.overview');
+
+    // ADDED: Route to show a specific request for viewing/editing
+    Route::get('/facility-booking/requests/{bookingRequest}', [BookingRequestController::class, 'show'])->name('facility-booking.show');
+    
+    // ADDED: Route to handle the update when a student saves changes
+    Route::put('/facility-booking/requests/{bookingRequest}', [BookingRequestController::class, 'update'])->name('facility-booking.update');
+
 
     // --- Student Concern Routes (Refactored to use a Controller) ---
     Route::prefix('student-concern')->name('student-concern.')->group(function () {
@@ -48,7 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/warning-slip', [StudentConcernController::class, 'showWarningSlipForm'])->name('warning-slip.create');
         Route::post('/warning-slip', [StudentConcernController::class, 'storeWarningSlip'])->name('warning-slip.store');
     
-       
+        
     });
 
     // --- Placeholder route for Calendar ---

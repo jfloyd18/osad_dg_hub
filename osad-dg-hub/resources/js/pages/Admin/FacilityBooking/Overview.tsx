@@ -81,7 +81,6 @@ const AdminRequestOverview = ({ stats, recentRequests, mostBooked }: PageProps) 
         reset();
     };
 
-    // --- FIX IS HERE: 'onSuccess' now directly opens the success modal ---
     const handleApprove = () => {
         if (!selectedRequest) return;
         setData('status', 'Approved');
@@ -114,10 +113,8 @@ const AdminRequestOverview = ({ stats, recentRequests, mostBooked }: PageProps) 
         });
     };
 
-    // --- FIX IS HERE: New handler to refresh page data after success ---
     const handleSuccessContinue = () => {
         setSuccessModalOpen(false);
-        // Reload the data for the table and stats to show the change
         router.reload({ only: ['stats', 'recentRequests', 'mostBooked'] });
     }
     
@@ -230,6 +227,11 @@ const AdminRequestOverview = ({ stats, recentRequests, mostBooked }: PageProps) 
                                     <label className="text-xs text-gray-500">Booking ID</label>
                                     <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{`#BK-${selectedRequest.id.toString().padStart(6, '0')}`}</p>
                                 </div>
+                                {/* --- FIX IS HERE: ADDED FACILITY FIELD --- */}
+                                <div>
+                                    <label className="text-xs text-gray-500">Facility</label>
+                                    <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{selectedRequest.facility_name}</p>
+                                </div>
                                 <div>
                                     <label className="text-xs text-gray-500">Department</label>
                                     <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{selectedRequest.department}</p>
@@ -239,15 +241,15 @@ const AdminRequestOverview = ({ stats, recentRequests, mostBooked }: PageProps) 
                                     <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{selectedRequest.contact_no}</p>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500">Event Date</label>
-                                    <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{formatDate(selectedRequest.event_start)}</p>
-                                </div>
-                                <div>
                                     <label className="text-xs text-gray-500">Expected Participants</label>
                                     <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{selectedRequest.estimated_people}</p>
                                 </div>
                             </div>
                             <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs text-gray-500">Event Date</label>
+                                    <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{formatDate(selectedRequest.event_start)}</p>
+                                </div>
                                  <div>
                                     <label className="text-xs text-gray-500">Time</label>
                                     <p className="p-2 border border-gray-200 rounded-md bg-gray-50">{`${formatTime(selectedRequest.event_start)} - ${formatTime(selectedRequest.event_end)}`}</p>
@@ -305,12 +307,11 @@ const AdminRequestOverview = ({ stats, recentRequests, mostBooked }: PageProps) 
                 </div>
             )}
             
-            {/* Success Modal */}
             {isSuccessModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
                     <div className="bg-white p-8 rounded-lg max-w-sm w-full shadow-xl text-center">
                         <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                            <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0" stroke="currentColor">
+                            <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>

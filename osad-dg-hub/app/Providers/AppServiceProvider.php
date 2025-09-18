@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        BookingRequest::class => BookingRequestPolicy::class, // <-- ADD THIS LINE
+    ];
     /**
      * Register any application services.
      */
