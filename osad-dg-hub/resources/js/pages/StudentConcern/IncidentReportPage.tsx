@@ -1,15 +1,17 @@
-// In: resources/js/pages/StudentConcern/IncidentReportPage.tsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import apiClient from '../../lib/api'; 
 
 const IncidentReportPage = () => {
+    // 👇 Add new state properties for the dates
     const [formData, setFormData] = useState({
         incident_title: '',
         details: '',
+        report_date: new Date().toISOString().substring(0, 10), // Auto-populate with current date
+        incident_date: '', // Manual input for the incident date
     });
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState<'success' | 'error' | null>(null);
 
@@ -24,7 +26,13 @@ const IncidentReportPage = () => {
         try {
             await apiClient.post('/api/concerns/create', formData);
             setSubmissionStatus('success');
-            setFormData({ incident_title: '', details: '' }); // Clear form
+            // Clear form and reset to current date after successful submission
+            setFormData({ 
+                incident_title: '', 
+                details: '',
+                report_date: new Date().toISOString().substring(0, 10),
+                incident_date: '',
+            }); 
         } catch (error) {
             console.error('Failed to submit incident report:', error);
             setSubmissionStatus('error');
@@ -41,7 +49,7 @@ const IncidentReportPage = () => {
                 
                 {submissionStatus === 'success' && (
                     <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-6 text-center">
-                        <p>Your incident report has been successfully submitted!</p>
+                        <p>Your incident report has been successfully submitted! 🎉</p>
                         <Link href={route('student-concern.overview')} className="mt-2 inline-block font-semibold text-green-700 hover:underline">
                             Go back to Overview
                         </Link>
@@ -50,11 +58,39 @@ const IncidentReportPage = () => {
 
                 {submissionStatus === 'error' && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
-                        <p>An error occurred. Please try again.</p>
+                        <p>An error occurred. Please try again. 😥</p>
                     </div>
                 )}
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* 👇 New date fields section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label htmlFor="report_date" className="block text-sm font-medium text-gray-700">Date of Report</label>
+                            <input
+                                type="date"
+                                id="report_date"
+                                name="report_date"
+                                value={formData.report_date}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
+                                readOnly // This makes the field non-editable
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="incident_date" className="block text-sm font-medium text-gray-700">Date of Incident</label>
+                            <input
+                                type="date"
+                                id="incident_date"
+                                name="incident_date"
+                                value={formData.incident_date}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                            />
+                        </div>
+                    </div>
+
                     <div>
                         <label htmlFor="incident_title" className="block text-sm font-medium text-gray-700">Incident Title</label>
                         <input

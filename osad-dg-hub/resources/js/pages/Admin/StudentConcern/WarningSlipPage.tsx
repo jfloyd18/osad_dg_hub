@@ -1,30 +1,20 @@
 import React, { useState } from 'react';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import { Head, Link } from '@inertiajs/react';
 
-// --- FIX: DEFINING TYPES LOCALLY ---
-// To avoid issues with path aliases like '@/', we'll define necessary types here.
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role?: 'admin' | 'student';
-}
-
+// To avoid issues with path aliases like '@/'.
 interface StudentData {
     name: string;
     student_id: string;
     section: string;
 }
 
-// --- FIX: REMOVED AUTH PROP AS LAYOUT IS REMOVED ---
 interface WarningSlipPageProps {
     student: StudentData;
     errors: Record<string, string>;
 }
 
-// NOTE: We are temporarily removing the AuthenticatedLayout and Inertia hooks to bypass build errors.
 export default function WarningSlipPage({ student, errors: validationErrors }: WarningSlipPageProps) {
-    
-    // --- FIX: Using standard React state instead of useForm ---
     const [data, setData] = useState({
         student_name: student?.name || '',
         student_id: student?.student_id || '',
@@ -37,23 +27,20 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
         incident_description: '',
     });
     
-    // Helper function to update state
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setData(prevData => ({ ...prevData, [name]: value }));
     };
 
-    // --- NOTE: This form will perform a full page refresh on submit ---
     return (
-        // The page is no longer wrapped in a layout
-        <>
-            {/* The Head component is removed as its import was failing */}
+        // 👇 FIX: Wrap the entire page content in AuthenticatedLayout
+        <AuthenticatedLayout> 
+            <Head title="Create Warning Slip" />
             <div className="bg-gray-100 min-h-screen">
                 <main className="p-8">
-                     <h2 className="font-semibold text-2xl text-gray-800 leading-tight mb-8">
+                    <h2 className="font-semibold text-2xl text-gray-800 leading-tight mb-8">
                         Create Warning Slip
                     </h2>
-
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6 bg-white border-b border-gray-200">
@@ -63,13 +50,8 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                                 <p className="text-sm text-gray-600 mb-6">
                                     Please provide the details of the incident for the student involved.
                                 </p>
-                                
-                                {/* --- FIX: Changed to a standard HTML form submission --- */}
                                 <form action="/admin/warning-slip" method="POST">
-                                    {/* CSRF Token - IMPORTANT for Laravel POST requests */}
                                     <input type="hidden" name="_token" value={(document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content} />
-
-                                    {/* Personal Information Section */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                         <div>
                                             <label htmlFor="student_name" className="block text-sm font-medium text-gray-700">Name</label>
@@ -117,8 +99,6 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                                             />
                                         </div>
                                     </div>
-                                    
-                                    {/* Contact & Address Section */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                         <div>
                                             <label htmlFor="address" className="block text-sm font-medium text-gray-700">Current address</label>
@@ -131,7 +111,7 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                             />
                                         </div>
-                                         <div>
+                                        <div>
                                             <label htmlFor="mobile_no" className="block text-sm font-medium text-gray-700">Mobile no.</label>
                                             <input
                                                 id="mobile_no"
@@ -154,8 +134,6 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                                             />
                                         </div>
                                     </div>
-
-                                    {/* Incident Details Section */}
                                     <div className="space-y-4">
                                         <div>
                                             <label htmlFor="incident_type" className="block text-sm font-medium text-gray-700">Type of Incident</label>
@@ -183,8 +161,6 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                                             ></textarea>
                                         </div>
                                     </div>
-
-                                    {/* Submit Button */}
                                     <div className="flex items-center justify-end mt-8">
                                         <button
                                             type="submit"
@@ -199,7 +175,6 @@ export default function WarningSlipPage({ student, errors: validationErrors }: W
                     </div>
                 </main>
             </div>
-        </>
+        </AuthenticatedLayout>
     );
 }
-

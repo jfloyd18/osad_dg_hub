@@ -30,12 +30,13 @@ const Sidebar = () => {
     ];
 
     const adminLinks: NavLinkItem[] = [
-        { name: 'Facility Booking', icon: DocumentReportIcon, children: [{ name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
+        { name: 'Facility Booking', icon: DocumentReportIcon, children: [
+                { name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
         { 
             name: 'Student Concern', 
             icon: ExclamationIcon, 
             children: [
-                { name: 'Request Overview', href: route('student-concern.overview') },
+                { name: 'Incident Reports', href: route('admin.concerns.overview') },
                 { name: 'Create Warning Slip', href: route('admin.warning-slip.create') }
             ] 
         },

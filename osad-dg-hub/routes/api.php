@@ -28,7 +28,8 @@ Route::get('/admin/dashboard-data', [AdminDashboardController::class, 'getData']
 Route::get('/admin/booking-requests', [AdminBookingController::class, 'index']);
 Route::patch('/admin/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus']);
 Route::get('/concerns/overview', [ConcernController::class, 'overview']);
-
+Route::put('/concerns/{concern}/status', [ConcernApiController::class, 'updateStatus']);
+Route::put('/concerns/{concern}/feedback', [ConcernApiController::class, 'updateFeedback']);
 
 // --- FIX IS HERE: The POST route is now public ---
 Route::post('/concerns/create', [ConcernController::class, 'store']);

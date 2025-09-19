@@ -6,7 +6,8 @@ use App\Http\Controllers\StudentConcernController;
 use App\Http\Controllers\Admin\FacilityBookingPageController;
 use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\BookingRequestController;
-use App\Http\Controllers\Admin\WarningSlipController; // <-- ADDED THIS IMPORT
+use App\Http\Controllers\Admin\WarningSlipController;
+use App\Http\Controllers\Admin\ConcernController; // <-- ADDED THIS IMPORT
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -74,17 +75,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     })->name('facility-booking.overview');
     
     Route::patch('/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus'])
-          ->name('booking-requests.updateStatus');
+            ->name('booking-requests.updateStatus');
 
     // --- UPDATED WARNING SLIP ROUTES ---
     // These routes now correctly point to the new Admin\WarningSlipController
     Route::get('/warning-slip', [WarningSlipController::class, 'create'])->name('warning-slip.create');
     Route::post('/warning-slip', [WarningSlipController::class, 'store'])->name('warning-slip.store');
-    
+
+    // THIS IS THE CORRECTED ROUTE
+    Route::get('/student-concern/overview', [ConcernController::class, 'index'])->name('concerns.overview');
 });
 
 
 // Ensure these files exist and contain your authentication and settings routes.
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
-
