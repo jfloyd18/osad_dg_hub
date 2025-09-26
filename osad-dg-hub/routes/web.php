@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\FacilityBookingPageController;
 use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\WarningSlipController;
-use App\Http\Controllers\Admin\ConcernController; // <-- ADDED THIS IMPORT
+use App\Http\Controllers\Admin\ConcernController;
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -75,18 +75,29 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     })->name('facility-booking.overview');
     
     Route::patch('/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus'])
-            ->name('booking-requests.updateStatus');
+        ->name('booking-requests.updateStatus');
 
-    // --- UPDATED WARNING SLIP ROUTES ---
-    // These routes now correctly point to the new Admin\WarningSlipController
+    // --- ADMIN STUDENT CONCERN ROUTES ---
+    // The main admin concern overview is managed by the ConcernController.
+    Route::get('/student-concern/overview', [ConcernController::class, 'index'])->name('concerns.overview');
+
+    // The new route to show a single, specific concern.
+    Route::get('/concerns/{concern}', [ConcernController::class, 'show'])->name('concerns.show');
+
+    // The routes for creating and storing a warning slip.
     Route::get('/warning-slip', [WarningSlipController::class, 'create'])->name('warning-slip.create');
     Route::post('/warning-slip', [WarningSlipController::class, 'store'])->name('warning-slip.store');
+    
+    // The route for the Warning Slip Overview page.
+    Route::get('/warnings/overview', [WarningSlipController::class, 'overview'])->name('warnings.overview');
 
-    // THIS IS THE CORRECTED ROUTE
-    Route::get('/student-concern/overview', [ConcernController::class, 'index'])->name('concerns.overview');
+    // The new route to show a single, specific warning slip.
+    Route::get('/warnings/{warningSlip}', [WarningSlipController::class, 'show'])->name('warnings.show');
+    
 });
 
 
 // Ensure these files exist and contain your authentication and settings routes.
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+

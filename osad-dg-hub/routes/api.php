@@ -23,6 +23,13 @@ Route::get('/facilities/most-booked', [BookingRequestController::class, 'mostBoo
 Route::get('/facilities', [\App\Http\Controllers\Api\FacilityController::class, 'index']);
 Route::get('/organizations', [OrganizationController::class, 'index']); 
 
+// --- WARNING SLIP ROUTES (Temporarily Public for Testing) ---
+Route::post('/warnings/create', [WarningSlipController::class, 'store']);
+    Route::get('/warnings', [WarningSlipController::class, 'index']);
+    Route::get('/warnings/{id}', [WarningSlipController::class, 'show']);
+    // Reverting to use {id} parameter for a more explicit controller action.
+Route::patch('/warnings/{id}/status', [WarningSlipController::class, 'updateStatus']);
+
 // --- ADMIN API ROUTES (Temporarily Public for Testing) ---
 Route::get('/admin/dashboard-data', [AdminDashboardController::class, 'getData']);
 Route::get('/admin/booking-requests', [AdminBookingController::class, 'index']);
@@ -46,8 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // --- USER-SPECIFIC WARNING SLIP ROUTES ---
+    // These routes are now duplicated above for public testing
+    // You can remove this section once authentication is properly set up
+    /*
     Route::prefix('warnings')->group(function () {
         Route::get('/', [WarningSlipController::class, 'index']);
         Route::post('/create', [WarningSlipController::class, 'store']);
     });
+    */
 });
+

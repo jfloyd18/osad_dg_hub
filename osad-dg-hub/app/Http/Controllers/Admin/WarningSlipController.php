@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\WarningSlip; // Assuming you have a WarningSlip model
+use App\Models\WarningSlip;
 use Illuminate\Support\Facades\Redirect;
 
 class WarningSlipController extends Controller
@@ -15,9 +15,6 @@ class WarningSlipController extends Controller
      */
     public function create()
     {
-        // --- FIX IS HERE ---
-        // We now pass a 'student' prop with empty values. This prevents
-        // the frontend component from crashing and ensures the form is blank.
         return Inertia::render('Admin/StudentConcern/WarningSlipPage', [
             'student' => [
                 'name' => '',
@@ -52,5 +49,24 @@ class WarningSlipController extends Controller
         // Redirect the admin back to their dashboard with a success message.
         return Redirect::route('admin.dashboard')->with('success', 'Warning slip created successfully.');
     }
-}
 
+    public function overview()
+    {
+        return Inertia::render('Admin/StudentConcern/WarningOverviewPage');
+    }
+
+    /**
+     * Display the specified warning slip.
+     *
+     * @param  \App\Models\WarningSlip  $warningSlip
+     * @return \Inertia\Response
+     */
+    public function show(WarningSlip $warningSlip)
+    {
+        // The $warningSlip model is automatically fetched from the database by route-model binding.
+        // We then pass it as a prop to the React component.
+        return Inertia::render('Admin/StudentConcern/WarningDetailPage', [
+            'warning' => $warningSlip
+        ]);
+    }
+}

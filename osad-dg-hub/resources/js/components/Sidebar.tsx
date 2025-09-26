@@ -13,142 +13,143 @@ const UserIcon = ({ className = "w-10 h-10" }: { className?: string }) => ( <svg
 const ChevronDownIcon = ({ className }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg> );
 
 type NavLinkItem = {
-    name: string;
-    icon: React.ComponentType<{ className?: string }>;
-    href?: string;
-    children?: { name: string; href: string }[];
+    name: string;
+    icon: React.ComponentType<{ className?: string }>;
+    href?: string;
+    children?: { name: string; href: string }[];
 };
 
 const Sidebar = () => {
-    const { auth, ziggy } = usePage<SharedData>().props;
-    const currentUser = auth.user;
-    const currentUrl = ziggy.location;
+    const { auth, ziggy } = usePage<SharedData>().props;
+    const currentUser = auth.user;
+    const currentUrl = ziggy.location;
 
-    const commonLinks: NavLinkItem[] = [
-        { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
-        { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
-    ];
+    const commonLinks: NavLinkItem[] = [
+        { name: 'Dashboard', icon: HomeIcon, href: route('dashboard') },
+        { name: 'Calendar', icon: CalendarIcon, href: route('calendar') },
+    ];
 
-    const adminLinks: NavLinkItem[] = [
-        { name: 'Facility Booking', icon: DocumentReportIcon, children: [
-                { name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
-        { 
-            name: 'Student Concern', 
-            icon: ExclamationIcon, 
-            children: [
-                { name: 'Incident Reports', href: route('admin.concerns.overview') },
-                { name: 'Create Warning Slip', href: route('admin.warning-slip.create') }
-            ] 
-        },
-        { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
-    ];
+    const adminLinks: NavLinkItem[] = [
+        { name: 'Facility Booking', icon: DocumentReportIcon, children: [
+                { name: 'Request Overview', href: route('admin.facility-booking.overview') }] },
+        { 
+            name: 'Student Concern', 
+            icon: ExclamationIcon, 
+            children: [
+                { name: 'Incident Reports', href: route('admin.concerns.overview') },
+                { name: 'Create Warning Slip', href: route('admin.warning-slip.create') },
+                // ADDED THE NEW LINK HERE
+                { name: 'Warning Slip Overview', href: route('admin.warnings.overview') },
+            ] 
+        },
+        { name: 'Organization Management', icon: UserGroupIcon, href: '#' },
+    ];
 
-    const studentLinks: NavLinkItem[] = [
-        {
-            name: 'Facility Booking', icon: DocumentReportIcon,
-            children: [
-                { name: 'Request Facility', href: route('facility-booking.request') },
-                { name: 'Request Overview', href: route('facility-booking.overview') },
-            ],
-        },
-        {
-            name: 'Student Concern', icon: ExclamationIcon,
-            children: [
-                { name: 'Concern Overview', href: route('student-concern.overview') },
-                { name: 'Incident Report', href: route('student-concern.lodge') },
-                { name: 'View Warnings', href: route('student-concern.warnings') },
-            ],
-        },
-    ];
+    const studentLinks: NavLinkItem[] = [
+        {
+            name: 'Facility Booking', icon: DocumentReportIcon,
+            children: [
+                { name: 'Request Facility', href: route('facility-booking.request') },
+                { name: 'Request Overview', href: route('facility-booking.overview') },
+            ],
+        },
+        {
+            name: 'Student Concern', icon: ExclamationIcon,
+            children: [
+                { name: 'Concern Overview', href: route('student-concern.overview') },
+                { name: 'Incident Report', href: route('student-concern.lodge') },
+                { name: 'View Warnings', href: route('student-concern.warnings') },
+            ],
+        },
+    ];
 
-    const navLinks: NavLinkItem[] = [
-        ...commonLinks,
-        ...(currentUser.role === 'admin' ? adminLinks : []),
-        ...(currentUser.role === 'student' ? studentLinks : []),
-    ];
+    const navLinks: NavLinkItem[] = [
+        ...commonLinks,
+        ...(currentUser.role === 'admin' ? adminLinks : []),
+        ...(currentUser.role === 'student' ? studentLinks : []),
+    ];
 
-    const getActiveCategory = () => {
-        const activeParent = navLinks.find(link => 
-            link.children?.some(child => currentUrl.startsWith(child.href))
-        );
-        return activeParent?.name || null;
-    };
+    const getActiveCategory = () => {
+        const activeParent = navLinks.find(link => 
+            link.children?.some(child => currentUrl.startsWith(child.href))
+        );
+        return activeParent?.name || null;
+    };
 
-    const [openMenu, setOpenMenu] = useState<string | null>(getActiveCategory);
-    
-    useEffect(() => {
-        const activeCategory = getActiveCategory();
-        if (activeCategory && activeCategory !== openMenu) {
-            setOpenMenu(activeCategory);
-        }
-    }, [currentUrl]);
+    const [openMenu, setOpenMenu] = useState<string | null>(getActiveCategory);
+    
+    useEffect(() => {
+        const activeCategory = getActiveCategory();
+        if (activeCategory && activeCategory !== openMenu) {
+            setOpenMenu(activeCategory);
+        }
+    }, [currentUrl]);
 
-    const isParentActive = (children: { href: string }[] | undefined) => {
-        if (!children) return false;
-        return children.some(child => currentUrl.startsWith(child.href));
-    };
-    
-    const handleMenuClick = (name: string) => {
-        setOpenMenu(openMenu === name ? null : name);
-    };
+    const isParentActive = (children: { href: string }[] | undefined) => {
+        if (!children) return false;
+        return children.some(child => currentUrl.startsWith(child.href));
+    };
+    
+    const handleMenuClick = (name: string) => {
+        setOpenMenu(openMenu === name ? null : name);
+    };
 
-    return (
-        <div className="flex flex-col h-screen w-64 bg-[#C83B51] text-white font-sans flex-shrink-0">
-            <div className="flex items-center p-4 mt-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-[#C83B51] mr-4">
-                    <UserIcon className="w-8 h-8" />
-                </div>
-                <div>
-                    <h2 className="text-lg font-bold">{currentUser.name}</h2>
-                    <p className="text-sm capitalize">{currentUser.role === 'admin' ? 'Administrator' : currentUser.role}</p>
-                </div>
-            </div>
+    return (
+        <div className="flex flex-col h-screen w-64 bg-[#C83B51] text-white font-sans flex-shrink-0">
+            <div className="flex items-center p-4 mt-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-[#C83B51] mr-4">
+                    <UserIcon className="w-8 h-8" />
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold">{currentUser.name}</h2>
+                    <p className="text-sm capitalize">{currentUser.role === 'admin' ? 'Administrator' : currentUser.role}</p>
+                </div>
+            </div>
 
-            <nav className="flex-grow mt-8 px-4">
-                <ul>
-                    {navLinks.map((link) => (
-                        <li key={link.name} className="mb-2">
-                            {link.children ? (
-                                <>
-                                    <button onClick={() => handleMenuClick(link.name)} className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${isParentActive(link.children) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
-                                        <div className="flex items-center">
-                                            <link.icon className="w-6 h-6 mr-4" />
-                                            <span className="font-medium">{link.name}</span>
-                                        </div>
-                                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${openMenu === link.name ? 'rotate-180' : ''}`} />
-                                    </button>
-                                    {openMenu === link.name && (
-                                        <ul className="pl-8 mt-2 space-y-2">
-                                            {link.children.map((child) => (
-                                                <li key={child.name}>
-                                                    <Link href={child.href} className={`block p-2 rounded-md text-sm transition-colors duration-200 ${currentUrl.startsWith(child.href) ? 'bg-[#9d2f41]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
-                                                        {child.name}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </>
-                            ) : (
-                                <Link href={link.href!} className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${currentUrl.startsWith(link.href!) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
-                                    <link.icon className="w-6 h-6 mr-4" />
-                                    <span className="font-medium">{link.name}</span>
-                                </Link>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </nav>
+            <nav className="flex-grow mt-8 px-4">
+                <ul>
+                    {navLinks.map((link) => (
+                        <li key={link.name} className="mb-2">
+                            {link.children ? (
+                                <>
+                                    <button onClick={() => handleMenuClick(link.name)} className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${isParentActive(link.children) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
+                                        <div className="flex items-center">
+                                            <link.icon className="w-6 h-6 mr-4" />
+                                            <span className="font-medium">{link.name}</span>
+                                        </div>
+                                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${openMenu === link.name ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {openMenu === link.name && (
+                                        <ul className="pl-8 mt-2 space-y-2">
+                                            {link.children.map((child) => (
+                                                <li key={child.name}>
+                                                    <Link href={child.href} className={`block p-2 rounded-md text-sm transition-colors duration-200 ${currentUrl.startsWith(child.href) ? 'bg-[#9d2f41]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
+                                                        {child.name}
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </>
+                            ) : (
+                                <Link href={link.href!} className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${currentUrl.startsWith(link.href!) ? 'bg-[#B03448]' : 'hover:bg-[#B03448] hover:bg-opacity-50'}`}>
+                                    <link.icon className="w-6 h-6 mr-4" />
+                                    <span className="font-medium">{link.name}</span>
+                                </Link>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </nav>
 
-            <div className="p-4 mb-4">
-                <Link href={route('logout')} method="post" as="button" className="w-full flex items-center p-3 rounded-lg transition-colors duration-200 hover:bg-[#B03448] hover:bg-opacity-50">
-                    <LogoutIcon className="w-6 h-6 mr-4" />
-                    <span className="font-medium">Logout</span>
-                </Link>
-            </div>
-        </div>
-    );
+            <div className="p-4 mb-4">
+                <Link href={route('logout')} method="post" as="button" className="w-full flex items-center p-3 rounded-lg transition-colors duration-200 hover:bg-[#B03448] hover:bg-opacity-50">
+                    <LogoutIcon className="w-6 h-6 mr-4" />
+                    <span className="font-medium">Logout</span>
+                </Link>
+            </div>
+        </div>
+    );
 };
 
 export default Sidebar;
-
