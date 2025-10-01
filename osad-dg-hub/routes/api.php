@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\BookingRequestController;
 use App\Http\Controllers\Api\ConcernController;
+use App\Http\Controllers\Api\ConcernApiController; // ADD THIS LINE
 use App\Http\Controllers\Api\WarningSlipController;
 use App\Http\Controllers\Api\OrganizationController;
 
@@ -25,18 +26,18 @@ Route::get('/organizations', [OrganizationController::class, 'index']);
 
 // --- WARNING SLIP ROUTES (Temporarily Public for Testing) ---
 Route::post('/warnings/create', [WarningSlipController::class, 'store']);
-    Route::get('/warnings', [WarningSlipController::class, 'index']);
-    Route::get('/warnings/{id}', [WarningSlipController::class, 'show']);
-    // Reverting to use {id} parameter for a more explicit controller action.
+Route::get('/warnings', [WarningSlipController::class, 'index']);
+Route::get('/warnings/{id}', [WarningSlipController::class, 'show']);
 Route::patch('/warnings/{id}/status', [WarningSlipController::class, 'updateStatus']);
 
 // --- ADMIN API ROUTES (Temporarily Public for Testing) ---
 Route::get('/admin/dashboard-data', [AdminDashboardController::class, 'getData']);
 Route::get('/admin/booking-requests', [AdminBookingController::class, 'index']);
 Route::patch('/admin/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus']);
+Route::get('/admin/concerns', [ConcernController::class, 'adminIndex']);
 Route::get('/concerns/overview', [ConcernController::class, 'overview']);
-Route::put('/concerns/{concern}/status', [ConcernApiController::class, 'updateStatus']);
-Route::put('/concerns/{concern}/feedback', [ConcernApiController::class, 'updateFeedback']);
+Route::put('/concerns/{id}/status', [ConcernApiController::class, 'updateStatus']);
+Route::put('/concerns/{id}/feedback', [ConcernApiController::class, 'updateFeedback']);
 
 // --- FIX IS HERE: The POST route is now public ---
 Route::post('/concerns/create', [ConcernController::class, 'store']);
@@ -44,22 +45,10 @@ Route::post('/concerns/create', [ConcernController::class, 'store']);
 
 // --- Protected routes (require login) ---
 Route::middleware('auth:sanctum')->group(function () {
-
     // USER-SPECIFIC FACILITY BOOKING ROUTES have been moved above to be temporarily public.
     
     // --- USER-SPECIFIC STUDENT CONCERN ROUTES ---
     Route::prefix('concerns')->group(function () {
         // The POST /create route has been moved out of this group to be public
     });
-
-    // --- USER-SPECIFIC WARNING SLIP ROUTES ---
-    // These routes are now duplicated above for public testing
-    // You can remove this section once authentication is properly set up
-    /*
-    Route::prefix('warnings')->group(function () {
-        Route::get('/', [WarningSlipController::class, 'index']);
-        Route::post('/create', [WarningSlipController::class, 'store']);
-    });
-    */
 });
-

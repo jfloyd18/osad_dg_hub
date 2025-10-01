@@ -25,7 +25,7 @@ const IncidentReportsPage = () => {
         const fetchIncidents = async () => {
             try {
                 setLoading(true);
-                const response = await apiClient.get('/api/concerns/overview');
+                const response = await apiClient.get('/api/admin/concerns');
                 
                 if (response.data && Array.isArray(response.data.data)) {
                     setIncidents(response.data.data);
