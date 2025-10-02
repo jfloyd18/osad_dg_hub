@@ -117,6 +117,37 @@ class ConcernController extends Controller
         ], 201);
     }
 
+    public function show($id)
+{
+    $concern = Concern::findOrFail($id);
+    return response()->json($concern);
+}
+
+public function update(Request $request, $id)
+{
+    $concern = Concern::findOrFail($id);
+    
+    if ($concern->status !== 'Pending') {
+        return response()->json([
+            'message' => 'Cannot edit concern. Only pending concerns can be edited.'
+        ], 403);
+    }
+    
+    $validatedData = $request->validate([
+        'incident_title' => 'required|string|max:255',
+        'details' => 'required|string',
+        'incident_date' => 'required|date',
+    ]);
+    
+    $concern->update($validatedData);
+    
+    return response()->json([
+        'message' => 'Concern updated successfully!',
+        'concern' => $concern
+    ]);
+}
+
+
     /**
  * Get all concerns for admin (not filtered by student_id)
  */
@@ -142,4 +173,6 @@ public function adminIndex()
         'data' => $concerns,
     ]);
 }
+
+
 }

@@ -42,9 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         Route::get('/lodge', [StudentConcernController::class, 'showIncidentReportForm'])->name('lodge'); 
         
-        // The store route for incident reports was missing, adding it back.
-        // If you don't have a store method in StudentConcernController, you can remove this line.
-        // Route::post('/lodge', [StudentConcernController::class, 'store'])->name('store');
+        Route::get('/view/{id}', [StudentConcernController::class, 'showViewForm'])->name('view');
+        // Route to edit an incident report (only for Pending status)
+        Route::get('/edit/{id}', [StudentConcernController::class, 'showEditForm'])->name('edit');
 
         Route::get('/warnings', [StudentConcernController::class, 'showWarnings'])->name('warnings');
     });
@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/calendar', function () {
         return Inertia::render('Calendar');
     })->name('calendar');
+
+    
 });
 
 
@@ -100,4 +102,3 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // Ensure these files exist and contain your authentication and settings routes.
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
-

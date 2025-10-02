@@ -33,4 +33,18 @@ class StudentConcernController extends Controller
     }
 
     // The old showWarningSlipForm method has been removed from this controller.
+
+    public function showViewForm($id)
+{
+    return Inertia::render('StudentConcern/ViewIncidentReportPage', [
+        'concernId' => (int)$id
+    ]);
+}
+
+    public function showEditForm($id)
+{
+    return Inertia::render('StudentConcern/EditIncidentReportPage', [
+        'concernId' => (int)$id
+    ]);
+}
 }

@@ -24,6 +24,7 @@ Route::get('/facilities/most-booked', [BookingRequestController::class, 'mostBoo
 Route::get('/facilities', [\App\Http\Controllers\Api\FacilityController::class, 'index']);
 Route::get('/organizations', [OrganizationController::class, 'index']); 
 
+
 // --- WARNING SLIP ROUTES (Temporarily Public for Testing) ---
 Route::post('/warnings/create', [WarningSlipController::class, 'store']);
 Route::get('/warnings', [WarningSlipController::class, 'index']);
@@ -41,7 +42,8 @@ Route::put('/concerns/{id}/feedback', [ConcernApiController::class, 'updateFeedb
 
 // --- FIX IS HERE: The POST route is now public ---
 Route::post('/concerns/create', [ConcernController::class, 'store']);
-
+Route::get('/concerns/{id}', [ConcernController::class, 'show']);
+Route::put('/concerns/{id}', [ConcernController::class, 'update']);
 
 // --- Protected routes (require login) ---
 Route::middleware('auth:sanctum')->group(function () {

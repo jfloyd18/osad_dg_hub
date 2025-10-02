@@ -18,12 +18,6 @@ const EditIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
 const RevertIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
 );
-const TrendsIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
-);
-const ChartIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
-);
 
 // --- Helper Types ---
 type RequestStatus = 'Pending' | 'Approved' | 'Revisions' | 'Rejected';
@@ -71,7 +65,6 @@ const ConcernOverviewPage = () => {
     const [recentRequests, setRecentRequests] = useState<ConcernRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState('trends');
     
     useEffect(() => {
         const fetchData = async () => {
@@ -148,12 +141,32 @@ const ConcernOverviewPage = () => {
                                             <td className="px-6 py-4 font-medium text-gray-900">{request.incident_title}</td>
                                             <td className="px-6 py-4">{formatDate(request.submitted_at)}</td>
                                             <td className="px-6 py-4"><StatusBadge status={request.status} /></td>
-                                            <td className="px-6 py-4">{request.feedback}</td>
+                                            <td className="px-6 py-4">{request.feedback || '-'}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex justify-end items-center gap-3">
-                                                    {request.status === 'Revisions' && <button className="text-gray-500 hover:text-gray-800"><RevertIcon /></button>}
-                                                    {request.status === 'Pending' && <button className="text-gray-500 hover:text-gray-800"><EditIcon /></button>}
-                                                    <button className="text-gray-500 hover:text-gray-800"><ViewIcon /></button>
+                                                    {request.status === 'Revisions' && (
+                                                        <button className="text-gray-500 hover:text-gray-800" title="Revert to previous version">
+                                                            <RevertIcon />
+                                                        </button>
+                                                    )}
+                                                    {request.status === 'Pending' && (
+                                                        <Link 
+                                                            href={route('student-concern.edit', request.id)}
+                                                            className="text-gray-500 hover:text-gray-800"
+                                                            title="Edit incident report"
+                                                        >
+                                                            <EditIcon />
+                                                        </Link>
+                                                    )}
+                                                    {(request.status === 'Approved' || request.status === 'Rejected') && (
+                                                        <Link 
+                                                            href={route('student-concern.view', request.id)}
+                                                            className="text-gray-500 hover:text-gray-800" 
+                                                            title="View details"
+                                                        >
+                                                            <ViewIcon />
+                                                        </Link>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
