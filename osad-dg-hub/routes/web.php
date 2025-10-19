@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentConcernController;
 use App\Http\Controllers\Admin\FacilityBookingPageController;
+use App\Http\Controllers\Admin\RoomManagementController;
 use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\WarningSlipController;
@@ -75,6 +76,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         $controller = new FacilityBookingPageController();
         return $controller->overview();
     })->name('facility-booking.overview');
+    
+    // NEW ROUTE: Room & Venue Management
+    Route::get('/facility-booking/room-management', function () {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
+        }
+        $controller = new RoomManagementController();
+        return $controller->index();
+    })->name('facility-booking.room-management');
     
     Route::patch('/booking-requests/{bookingRequest}/status', [AdminBookingController::class, 'updateStatus'])
         ->name('booking-requests.updateStatus');

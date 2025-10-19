@@ -6,9 +6,11 @@ use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\BookingRequestController;
 use App\Http\Controllers\Api\ConcernController;
-use App\Http\Controllers\Api\ConcernApiController; // ADD THIS LINE
+use App\Http\Controllers\Api\ConcernApiController;
 use App\Http\Controllers\Api\WarningSlipController;
 use App\Http\Controllers\Api\OrganizationController;
+use App\Http\Controllers\Api\FacilityAvailabilityController;
+use App\Http\Controllers\Admin\RoomManagementController;
 
 // --- Authenticated user endpoint (leave as-is) ---
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -24,6 +26,9 @@ Route::get('/facilities/most-booked', [BookingRequestController::class, 'mostBoo
 Route::get('/facilities', [\App\Http\Controllers\Api\FacilityController::class, 'index']);
 Route::get('/organizations', [OrganizationController::class, 'index']); 
 
+// --- FACILITY AVAILABILITY ROUTES ---
+Route::post('/facilities/check-availability', [FacilityAvailabilityController::class, 'checkAvailability']);
+Route::post('/facilities/{facilityId}/check-availability', [FacilityAvailabilityController::class, 'checkFacilityAvailability']);
 
 // --- WARNING SLIP ROUTES (Temporarily Public for Testing) ---
 Route::post('/warnings/create', [WarningSlipController::class, 'store']);
@@ -39,6 +44,9 @@ Route::get('/admin/concerns', [ConcernController::class, 'adminIndex']);
 Route::get('/concerns/overview', [ConcernController::class, 'overview']);
 Route::put('/concerns/{id}/status', [ConcernApiController::class, 'updateStatus']);
 Route::put('/concerns/{id}/feedback', [ConcernApiController::class, 'updateFeedback']);
+
+// --- ROOM MANAGEMENT API ROUTES ---
+Route::get('/admin/facilities/{facilityId}/bookings', [RoomManagementController::class, 'getFacilityBookings']);
 
 // --- FIX IS HERE: The POST route is now public ---
 Route::post('/concerns/create', [ConcernController::class, 'store']);
