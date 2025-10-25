@@ -1,5 +1,9 @@
 <?php
 
+// ============================================
+// FILE: routes/api.php
+// ============================================
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdminBookingController;
@@ -11,6 +15,7 @@ use App\Http\Controllers\Api\WarningSlipController;
 use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\FacilityAvailabilityController;
 use App\Http\Controllers\Admin\RoomManagementController;
+use App\Http\Controllers\Admin\ReportController; // NEW: Add this import
 
 // --- Authenticated user endpoint (leave as-is) ---
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -52,6 +57,19 @@ Route::get('/admin/facilities/{facilityId}/bookings', [RoomManagementController:
 Route::post('/concerns/create', [ConcernController::class, 'store']);
 Route::get('/concerns/{id}', [ConcernController::class, 'show']);
 Route::put('/concerns/{id}', [ConcernController::class, 'update']);
+
+// ============================================
+// NEW: REPORT API ROUTES
+// ============================================
+Route::prefix('admin/reports')->group(function () {
+    // Individual report endpoints
+    Route::get('/bookings', [ReportController::class, 'getBookingReports']);
+    Route::get('/concerns', [ReportController::class, 'getConcernReports']);
+    Route::get('/warnings', [ReportController::class, 'getWarningReports']);
+    
+    // All reports endpoint
+    Route::get('/all', [ReportController::class, 'getAllReports']);
+});
 
 // --- Protected routes (require login) ---
 Route::middleware('auth:sanctum')->group(function () {

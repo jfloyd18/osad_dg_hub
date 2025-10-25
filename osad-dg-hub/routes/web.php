@@ -1,5 +1,9 @@
 <?php
 
+// ============================================
+// FILE: routes/web.php
+// ============================================
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\StudentConcernController;
@@ -9,6 +13,7 @@ use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\BookingRequestController;
 use App\Http\Controllers\Admin\WarningSlipController;
 use App\Http\Controllers\Admin\ConcernController;
+use App\Http\Controllers\Admin\ReportController; // NEW: Add this import
 
 // The root URL will now render your login page.
 Route::get('/', function () {
@@ -105,6 +110,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // The new route to show a single, specific warning slip.
     Route::get('/warnings/{warningSlip}', [WarningSlipController::class, 'show'])->name('warnings.show');
+    
+    // ============================================
+    // NEW: REPORT GENERATION PAGE ROUTE
+    // ============================================
+    Route::get('/reports', function () {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
+        }
+        return Inertia::render('Admin/Reports/ReportPage');
+    })->name('reports');
     
 });
 

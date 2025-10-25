@@ -6,13 +6,32 @@ use App\Http\Controllers\Controller;
 use App\Models\BookingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AdminBookingController extends Controller
 {
     /**
      * Get all booking requests with stats for admin overview
+     * Also supports date filtering for reports
      */
-    public function index()
+    public function index(Request $request)
+    {
+        // Check if this is a report request (has date filters)
+        $isReportRequest = $request->has('start_date') && $request->has('end_date');
+
+        if ($isReportRequest) {
+            // Handle report data with date filtering
+            return $this->getReportData($request);
+        }
+
+        // Original dashboard data (no date filtering)
+        return $this->getDashboardData();
+    }
+
+    /**
+     * Get dashboard data (original functionality)
+     */
+    private function getDashboardData()
     {
         // Get statistics
         $stats = [
@@ -58,6 +77,59 @@ class AdminBookingController extends Controller
             'recentRequests' => $recentRequests,
             'mostBooked' => $mostBooked,
         ]);
+    }
+
+    /**
+     * Get report data with date filtering (new functionality)
+     */
+    private function getReportData(Request $request)
+    {
+        try {
+            $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ]);
+
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+            $bookings = BookingRequest::with('user')
+                ->whereBetween('submitted_at', [$startDate, $endDate])
+                ->orderBy('submitted_at', 'desc')
+                ->get()
+                ->map(function ($booking) {
+                    return [
+                        'id' => $booking->id,
+                        'event_name' => $booking->event_name,
+                        'facility_name' => $booking->facility_name,
+                        'department' => $booking->department,
+                        'organization' => $booking->organization,
+                        'contact_no' => $booking->contact_no,
+                        'event_start' => $booking->event_start,
+                        'event_end' => $booking->event_end,
+                        'estimated_people' => $booking->estimated_people,
+                        'status' => $booking->status,
+                        'submitted_at' => $booking->submitted_at,
+                        'feedback' => $booking->feedback,
+                        'purpose' => $booking->purpose ?? '',
+                        'user_name' => $booking->user ? $booking->user->name : 'Unknown',
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookings,
+                'count' => $bookings->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error fetching booking report data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch booking requests',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
