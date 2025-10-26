@@ -9,79 +9,62 @@ class BookingRequest extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'booking_requests';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'user_id',
-        'facility_id',
-        'facility_name',
-        'event_name',
-        'event_start',
-        'event_end',
-        'estimated_people',
-        'event_date',
-        'start_time',
-        'end_time',
-        'purpose',
         'department',
+        'organization',
         'contact_no',
+        'event_name',
+        'facility_id',
+        'estimated_people',
+        'event_start_date',
+        'event_start_time',
+        'event_end_date',
+        'event_end_time',
+        'purpose',
+        'person_responsible',
+        'moderator',
+        'activity_plan_path',
+        'booking_id',
         'status',
         'feedback',
-        'email',
-        'email_verified_at',
-        'password',
-        'remember_token',
-        'created_at',
-        'updated_at',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'event_start' => 'datetime',
-        'event_end' => 'datetime',
-        'event_date' => 'date',
-        'email_verified_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'event_start_date' => 'date',
+        'event_end_date' => 'date',
+        'estimated_people' => 'integer',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the facility that owns the booking request.
-     */
+    // Relationships
     public function facility()
     {
-        return $this->belongsTo(Facility::class, 'facility_id');
+        return $this->belongsTo(Facility::class);
     }
 
-    /**
-     * Get the user that owns the booking request.
-     */
-    public function user()
+    // Auto-generate booking_id on creation
+    protected static function boot()
     {
-        return $this->belongsTo(User::class);
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (empty($model->booking_id)) {
+                // Get the last booking request
+                $lastBooking = static::withTrashed()->orderBy('id', 'desc')->first();
+                $nextId = $lastBooking ? $lastBooking->id + 1 : 1;
+                $model->booking_id = 'BK-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+            }
+        });
+    }
+
+    // Accessor for event_start datetime
+    public function getEventStartAttribute()
+    {
+        return $this->event_start_date . ' ' . $this->event_start_time;
+    }
+
+    // Accessor for event_end datetime
+    public function getEventEndAttribute()
+    {
+        return $this->event_end_date . ' ' . $this->event_end_time;
     }
 }
